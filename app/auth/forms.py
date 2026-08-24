@@ -30,3 +30,14 @@ class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired()])
     remember_me = BooleanField("Keep me logged in")
+
+
+class ForgotPasswordForm(FlaskForm):
+    email = StringField("Email", validators=[DataRequired(), Email()])
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField("New password", validators=[DataRequired(), Length(min=8, message="Use at least 8 characters.")])
+    confirm_password = PasswordField(
+        "Confirm new password", validators=[DataRequired(), EqualTo("password", message="Passwords must match.")]
+    )

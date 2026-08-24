@@ -147,6 +147,7 @@ STATUS_LABELS = {
     "completed": "Completed - payment due",
     "paid": "Paid",
     "rated": "Paid & rated",
+    "cancelled": "Cancelled",
 }
 
 # Certification uploads: real-world documents are almost always a PDF or a

@@ -12,7 +12,9 @@ import random
 from datetime import datetime
 from decimal import Decimal
 
+from flask import current_app
 from flask_login import UserMixin
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .extensions import db
@@ -75,6 +77,24 @@ class User(UserMixin, db.Model):
 
     def check_password(self, raw_password):
         return check_password_hash(self.password_hash, raw_password)
+
+    def generate_reset_token(self):
+        """
+        A signed, stateless token encoding this user's email -- no database
+        column needed to track it, and it self-expires (see
+        verify_reset_token) without any cleanup job.
+        """
+        serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+        return serializer.dumps(self.email, salt="password-reset")
+
+    @staticmethod
+    def verify_reset_token(token, max_age):
+        serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+        try:
+            email = serializer.loads(token, salt="password-reset", max_age=max_age)
+        except (BadSignature, SignatureExpired):
+            return None
+        return User.query.filter_by(email=email).first()
 
     def __repr__(self):
         return f"<User {self.email} ({self.role})>"
@@ -239,6 +259,16 @@ class ServiceRequest(db.Model):
         self.declined_by = ",".join(str(i) for i in ids)
 
     # ---- state machine ---------------------------------------------
+
+    def cancel(self):
+        """
+        A customer can only back out before a mechanic has committed to the
+        job -- once accepted, the mechanic may already be on their way or
+        have set aside the appointment slot, so cancellation stops here.
+        """
+        if self.status != "pending":
+            raise ValueError("Only a pending request can be cancelled.")
+        self.status = "cancelled"
 
     def accept(self, mechanic_profile):
         if self.status != "pending":

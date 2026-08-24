@@ -4,6 +4,19 @@
 {% block content %}
   <h1>Job history</h1>
 
+  <form method="GET" class="filter-bar">
+    <select name="status" class="input">
+      <option value="">All statuses</option>
+      {% for key, label in STATUS_LABELS.items() %}
+        <option value="{{ key }}" {{ "selected" if status_filter == key }}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-ghost btn-small">Filter</button>
+    {% if status_filter %}
+      <a href="{{ url_for('mechanic.job_history') }}" class="btn btn-ghost btn-small">Clear</a>
+    {% endif %}
+  </form>
+
   {% if pagination.items %}
     <div class="card-list">
       {% for r in pagination.items %}
@@ -16,10 +29,10 @@
         </a>
       {% endfor %}
     </div>
-    {{ pagination_nav(pagination, 'mechanic.job_history') }}
+    {{ pagination_nav(pagination, 'mechanic.job_history', status=status_filter) }}
   {% else %}
     <div class="card empty-state">
-      <p class="muted">You haven't taken any jobs yet.</p>
+      <p class="muted">{{ 'No jobs match this filter.' if status_filter else "You haven't taken any jobs yet." }}</p>
     </div>
   {% endif %}
 {% endblock %}

@@ -120,6 +120,20 @@ main.container {
   margin-top: 32px;
 }
 
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-bar input,
+.filter-bar select {
+  width: auto;
+  flex: 1 1 200px;
+}
+
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -486,7 +500,7 @@ textarea:focus {
   color: var(--green);
 }
 
-.badge-suspended, .badge-urgent {
+.badge-suspended, .badge-urgent, .badge-cancelled {
   background: #fbeaea;
   color: var(--red);
 }

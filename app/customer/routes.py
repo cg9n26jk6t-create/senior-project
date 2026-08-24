@@ -33,7 +33,7 @@ def dashboard():
     active_requests = (
         ServiceRequest.query.filter(
             ServiceRequest.customer_id == current_user.id,
-            ServiceRequest.status.notin_(["paid", "rated"]),
+            ServiceRequest.status.notin_(["paid", "rated", "cancelled"]),
         )
         .order_by(ServiceRequest.created_at.desc())
         .all()
@@ -261,6 +261,20 @@ def request_detail(request_id):
         complaint_form=complaint_form,
         map_zoom=LEBANON_MAP_DEFAULT_ZOOM,
     )
+
+
+@customer_bp.route("/requests/<int:request_id>/cancel", methods=["POST"])
+@role_required("customer")
+def cancel_request(request_id):
+    svc_request = _own_request_or_404(request_id)
+    try:
+        svc_request.cancel()
+        db.session.commit()
+        flash("Request cancelled.", "info")
+    except ValueError as exc:
+        db.session.rollback()
+        flash(str(exc), "error")
+    return redirect(url_for("customer.request_detail", request_id=svc_request.id))
 
 
 @customer_bp.route("/requests/<int:request_id>/tracking")

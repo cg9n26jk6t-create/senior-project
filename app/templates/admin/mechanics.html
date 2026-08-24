@@ -4,6 +4,21 @@
 {% block content %}
   <h1>Mechanics</h1>
 
+  <form method="GET" class="filter-bar">
+    <input type="text" name="q" class="input" placeholder="Search name or email" value="{{ query_text }}">
+    <select name="status" class="input">
+      <option value="">All statuses</option>
+      <option value="unregistered" {{ "selected" if status_filter == "unregistered" }}>Unregistered</option>
+      <option value="pending" {{ "selected" if status_filter == "pending" }}>Pending</option>
+      <option value="approved" {{ "selected" if status_filter == "approved" }}>Approved</option>
+      <option value="suspended" {{ "selected" if status_filter == "suspended" }}>Suspended</option>
+    </select>
+    <button type="submit" class="btn btn-ghost btn-small">Filter</button>
+    {% if query_text or status_filter %}
+      <a href="{{ url_for('admin.mechanics') }}" class="btn btn-ghost btn-small">Clear</a>
+    {% endif %}
+  </form>
+
   {% if pagination.items %}
     <div class="card-list">
       {% for profile in pagination.items %}
@@ -51,10 +66,10 @@
         </div>
       {% endfor %}
     </div>
-    {{ pagination_nav(pagination, 'admin.mechanics') }}
+    {{ pagination_nav(pagination, 'admin.mechanics', q=query_text, status=status_filter) }}
   {% else %}
     <div class="card empty-state">
-      <p class="muted">No mechanics registered yet.</p>
+      <p class="muted">{{ 'No mechanics match your filters.' if query_text or status_filter else 'No mechanics registered yet.' }}</p>
     </div>
   {% endif %}
 {% endblock %}

@@ -4,6 +4,18 @@
 {% block content %}
   <h1>Complaints</h1>
 
+  <form method="GET" class="filter-bar">
+    <select name="status" class="input">
+      <option value="">All statuses</option>
+      <option value="open" {{ "selected" if status_filter == "open" }}>Open</option>
+      <option value="resolved" {{ "selected" if status_filter == "resolved" }}>Resolved</option>
+    </select>
+    <button type="submit" class="btn btn-ghost btn-small">Filter</button>
+    {% if status_filter %}
+      <a href="{{ url_for('admin.complaints') }}" class="btn btn-ghost btn-small">Clear</a>
+    {% endif %}
+  </form>
+
   {% if pagination.items %}
     <div class="card-list">
       {% for c in pagination.items %}
@@ -23,10 +35,10 @@
         </div>
       {% endfor %}
     </div>
-    {{ pagination_nav(pagination, 'admin.complaints') }}
+    {{ pagination_nav(pagination, 'admin.complaints', status=status_filter) }}
   {% else %}
     <div class="card empty-state">
-      <p class="muted">No complaints filed yet.</p>
+      <p class="muted">{{ 'No complaints match this filter.' if status_filter else 'No complaints filed yet.' }}</p>
     </div>
   {% endif %}
 {% endblock %}

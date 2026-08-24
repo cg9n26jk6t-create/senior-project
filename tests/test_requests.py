@@ -94,6 +94,28 @@ def test_appointment_booking_preassigns_the_chosen_mechanic(client, seeded):
     assert created.status == "pending"  # still needs the mechanic to accept
 
 
+def test_customer_can_cancel_own_pending_request(client, seeded):
+    login(client, "karim@example.com", "Customer123!")
+
+    response = client.post(f"/customer/requests/{seeded['request'].id}/cancel", follow_redirects=True)
+
+    assert response.status_code == 200
+    assert seeded["request"].status == "cancelled"
+
+
+def test_customer_cannot_cancel_another_customers_request(client, seeded, app):
+    other_customer = User(name="Layal Fares", email="layal@example.com", phone="+961 71 987 654", role="customer")
+    other_customer.set_password("Customer123!")
+    db.session.add(other_customer)
+    db.session.commit()
+
+    login(client, "layal@example.com", "Customer123!")
+    response = client.post(f"/customer/requests/{seeded['request'].id}/cancel")
+
+    assert response.status_code == 403
+    assert seeded["request"].status == "pending"
+
+
 def test_incoming_requests_sorted_nearest_first(client, app, seeded):
     """A mechanic with a location set should see closer on-demand jobs first."""
     profile = seeded["mechanic_profile"]

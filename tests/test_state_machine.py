@@ -230,3 +230,25 @@ def test_release_does_nothing_once_accepted(app, seeded):
     svc_request.release(profile)
 
     assert svc_request.mechanic_id == profile.id
+
+
+# ---- cancellation ---------------------------------------------------------
+
+
+def test_customer_can_cancel_a_pending_request(app, seeded):
+    svc_request = seeded["request"]
+
+    svc_request.cancel()
+
+    assert svc_request.status == "cancelled"
+
+
+def test_cannot_cancel_once_accepted(app, seeded):
+    svc_request = seeded["request"]
+    profile = seeded["mechanic_profile"]
+    svc_request.accept(profile)
+
+    with pytest.raises(ValueError):
+        svc_request.cancel()
+
+    assert svc_request.status == "accepted"

@@ -52,12 +52,22 @@ def dashboard():
 @role_required("admin")
 def mechanics():
     page = request.args.get("page", 1, type=int)
-    pagination = (
-        MechanicProfile.query.join(User)
-        .order_by(MechanicProfile.status.asc(), User.name.asc())
-        .paginate(page=page, per_page=10, error_out=False)
+    status_filter = request.args.get("status", "").strip()
+    query_text = request.args.get("q", "").strip()
+
+    query = MechanicProfile.query.join(User)
+    if status_filter:
+        query = query.filter(MechanicProfile.status == status_filter)
+    if query_text:
+        like = f"%{query_text}%"
+        query = query.filter(db.or_(User.name.ilike(like), User.email.ilike(like)))
+
+    pagination = query.order_by(MechanicProfile.status.asc(), User.name.asc()).paginate(
+        page=page, per_page=10, error_out=False
     )
-    return render_template("admin/mechanics.html", pagination=pagination)
+    return render_template(
+        "admin/mechanics.html", pagination=pagination, status_filter=status_filter, query_text=query_text
+    )
 
 
 def _mechanic_or_404(mechanic_id):
@@ -121,30 +131,47 @@ def reactivate_mechanic(mechanic_id):
 @role_required("admin")
 def requests_list():
     page = request.args.get("page", 1, type=int)
-    pagination = (
-        ServiceRequest.query.order_by(ServiceRequest.created_at.desc()).paginate(page=page, per_page=15, error_out=False)
+    status_filter = request.args.get("status", "").strip()
+
+    query = ServiceRequest.query
+    if status_filter:
+        query = query.filter(ServiceRequest.status == status_filter)
+
+    pagination = query.order_by(ServiceRequest.created_at.desc()).paginate(page=page, per_page=15, error_out=False)
+    return render_template(
+        "admin/requests.html", pagination=pagination, STATUS_LABELS=STATUS_LABELS, status_filter=status_filter
     )
-    return render_template("admin/requests.html", pagination=pagination, STATUS_LABELS=STATUS_LABELS)
 
 
 @admin_bp.route("/customers")
 @role_required("admin")
 def customers():
     page = request.args.get("page", 1, type=int)
-    pagination = (
-        User.query.filter_by(role="customer").order_by(User.created_at.desc()).paginate(page=page, per_page=10, error_out=False)
-    )
-    return render_template("admin/customers.html", pagination=pagination)
+    query_text = request.args.get("q", "").strip()
+
+    query = User.query.filter_by(role="customer")
+    if query_text:
+        like = f"%{query_text}%"
+        query = query.filter(db.or_(User.name.ilike(like), User.email.ilike(like)))
+
+    pagination = query.order_by(User.created_at.desc()).paginate(page=page, per_page=10, error_out=False)
+    return render_template("admin/customers.html", pagination=pagination, query_text=query_text)
 
 
 @admin_bp.route("/complaints")
 @role_required("admin")
 def complaints():
     page = request.args.get("page", 1, type=int)
-    pagination = Complaint.query.order_by(Complaint.status.asc(), Complaint.created_at.desc()).paginate(
+    status_filter = request.args.get("status", "").strip()
+
+    query = Complaint.query
+    if status_filter:
+        query = query.filter(Complaint.status == status_filter)
+
+    pagination = query.order_by(Complaint.status.asc(), Complaint.created_at.desc()).paginate(
         page=page, per_page=10, error_out=False
     )
-    return render_template("admin/complaints.html", pagination=pagination)
+    return render_template("admin/complaints.html", pagination=pagination, status_filter=status_filter)
 
 
 @admin_bp.route("/complaints/<int:complaint_id>/resolve", methods=["POST"])

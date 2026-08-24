@@ -4,6 +4,19 @@
 {% block content %}
   <h1>All requests</h1>
 
+  <form method="GET" class="filter-bar">
+    <select name="status" class="input">
+      <option value="">All statuses</option>
+      {% for key, label in STATUS_LABELS.items() %}
+        <option value="{{ key }}" {{ "selected" if status_filter == key }}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-ghost btn-small">Filter</button>
+    {% if status_filter %}
+      <a href="{{ url_for('admin.requests_list') }}" class="btn btn-ghost btn-small">Clear</a>
+    {% endif %}
+  </form>
+
   {% if pagination.items %}
     <div class="card-list">
       {% for r in pagination.items %}
@@ -21,10 +34,10 @@
         </div>
       {% endfor %}
     </div>
-    {{ pagination_nav(pagination, 'admin.requests_list') }}
+    {{ pagination_nav(pagination, 'admin.requests_list', status=status_filter) }}
   {% else %}
     <div class="card empty-state">
-      <p class="muted">No requests have been made yet.</p>
+      <p class="muted">{{ 'No requests match this filter.' if status_filter else 'No requests have been made yet.' }}</p>
     </div>
   {% endif %}
 {% endblock %}

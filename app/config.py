@@ -41,6 +41,21 @@ class Config:
     UPLOAD_FOLDER = os.path.join(basedir, "instance", "uploads", "certifications")
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5 MB
 
+    # Optional SMTP settings for actually emailing password-reset links (see
+    # app/email_utils.py). Leave MAIL_SERVER blank to fall back to showing
+    # the reset link directly on screen -- the same "simulated" pattern used
+    # for Stripe above, so the feature works out of the box with no email
+    # account required.
+    MAIL_SERVER = os.environ.get("MAIL_SERVER", "")
+    MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))
+    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", "true").lower() == "true"
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
+    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "no-reply@roadrescue.lb")
+
+    # How long a password-reset link stays valid for.
+    PASSWORD_RESET_MAX_AGE_SECONDS = 3600
+
 
 class TestingConfig(Config):
     """Configuration used by the pytest suite: isolated in-memory database."""

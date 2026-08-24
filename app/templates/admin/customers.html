@@ -4,6 +4,14 @@
 {% block content %}
   <h1>Customers</h1>
 
+  <form method="GET" class="filter-bar">
+    <input type="text" name="q" class="input" placeholder="Search name or email" value="{{ query_text }}">
+    <button type="submit" class="btn btn-ghost btn-small">Search</button>
+    {% if query_text %}
+      <a href="{{ url_for('admin.customers') }}" class="btn btn-ghost btn-small">Clear</a>
+    {% endif %}
+  </form>
+
   {% if pagination.items %}
     <div class="card-list">
       {% for user in pagination.items %}
@@ -16,10 +24,10 @@
         </div>
       {% endfor %}
     </div>
-    {{ pagination_nav(pagination, 'admin.customers') }}
+    {{ pagination_nav(pagination, 'admin.customers', q=query_text) }}
   {% else %}
     <div class="card empty-state">
-      <p class="muted">No customers registered yet.</p>
+      <p class="muted">{{ 'No customers match your search.' if query_text else 'No customers registered yet.' }}</p>
     </div>
   {% endif %}
 {% endblock %}

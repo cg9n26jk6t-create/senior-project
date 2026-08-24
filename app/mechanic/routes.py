@@ -254,12 +254,16 @@ def advance_job(request_id):
 @approved_mechanic_required
 def job_history():
     page = request.args.get("page", 1, type=int)
-    pagination = (
-        ServiceRequest.query.filter_by(mechanic_id=current_user.mechanic_profile.id)
-        .order_by(ServiceRequest.created_at.desc())
-        .paginate(page=page, per_page=10, error_out=False)
+    status_filter = request.args.get("status", "").strip()
+
+    query = ServiceRequest.query.filter_by(mechanic_id=current_user.mechanic_profile.id)
+    if status_filter:
+        query = query.filter(ServiceRequest.status == status_filter)
+
+    pagination = query.order_by(ServiceRequest.created_at.desc()).paginate(page=page, per_page=10, error_out=False)
+    return render_template(
+        "mechanic/jobs.html", pagination=pagination, STATUS_LABELS=STATUS_LABELS, status_filter=status_filter
     )
-    return render_template("mechanic/jobs.html", pagination=pagination, STATUS_LABELS=STATUS_LABELS)
 
 
 @mechanic_bp.route("/profile", methods=["GET", "POST"])

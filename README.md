@@ -7,15 +7,17 @@ Jinja2 templates.
 ## Features
 
 - **Customers** can register, manage multiple vehicles, request roadside assistance by
-  dropping a pin on an interactive Lebanon map (or typing an address), track their
-  mechanic live once en route (including a moving marker on the map), pay either in-app
-  (Stripe test mode) or in cash, and rate/complain afterwards -- with a dedicated "My
-  reviews & complaints" history page.
+  dropping a pin on an interactive Lebanon map (or typing an address), cancel a request
+  while it's still pending, track their mechanic live once en route (including a moving
+  marker on the map), pay either in-app (Stripe test mode) or in cash, and rate/complain
+  afterwards -- with a dedicated "My reviews & complaints" history page. Forgot your
+  password? A self-service reset flow is one click away from the login page.
 - **Mechanics** apply by uploading certification documents (drag-and-drop or file
   picker), get approved by an admin, toggle their availability, and work jobs through a
-  defined status pipeline.
+  defined status pipeline, with search/filter on their job history.
 - **Admins** review and open uploaded certification documents, approve/suspend
-  mechanics, review complaints, and see platform-wide stats.
+  mechanics, review complaints, see platform-wide stats, and search/filter every
+  mechanic, customer, and request list.
 
 All of it is localized for Lebanon: kilometers (not miles), USD pricing, `+961` phone
 numbers, and a seeded list of Lebanese service areas -- no US-specific defaults anywhere.
@@ -115,6 +117,29 @@ Stripe **test mode** instead:
    tokenizes it directly in the browser, and the backend only ever sees a
    PaymentIntent id, which it re-verifies with Stripe before marking the request paid.
 
+## Enabling real password-reset emails
+
+By default (no mail server configured) "Forgot your password?" on the login page still
+works end-to-end -- it just shows the reset link directly on screen instead of emailing
+it, so the feature works out of the box with no email account required. To actually send
+the link by email instead:
+
+1. Set your SMTP server's details as environment variables before running the app:
+
+   ```bash
+   export MAIL_SERVER=smtp.gmail.com
+   export MAIL_PORT=587
+   export MAIL_USERNAME=you@gmail.com
+   export MAIL_PASSWORD=your-app-password
+   export MAIL_DEFAULT_SENDER=no-reply@roadrescue.lb
+   ```
+2. Restart the app. Reset links are signed and self-expiring (`itsdangerous`, valid for
+   one hour by default -- see `PASSWORD_RESET_MAX_AGE_SECONDS` in
+   [app/config.py](app/config.py)), so no database column or cleanup job is needed to
+   invalidate them. The "forgot password" page always shows the same confirmation
+   message regardless of whether the email matched an account, so it can't be used to
+   check which emails are registered.
+
 ## What's simulated vs. production-ready
 
 This is a capstone demo, so a few things are intentionally simplified:
@@ -127,6 +152,7 @@ This is a capstone demo, so a few things are intentionally simplified:
 | Payments | A real embedded Stripe Elements card field in **test mode** (PaymentIntents API, re-verified server-side before marking paid) when Stripe keys are set, a simulated "confirm payment" screen if not, or a cash option that just records the choice | Stripe **live mode**, plus webhook-based confirmation as a fallback to the client-side check (covers the case where the browser tab closes right after payment); cash payments would likely need mechanic-side confirmation before marking paid |
 | Platform commission | A flat 15% (`PLATFORM_COMMISSION_RATE` in [app/constants.py](app/constants.py)) taken from every completed job; the mechanic gets the rest, and the admin dashboard shows both the gross job value and the platform's cut separately | Same mechanism; a real deployment would likely make the rate configurable per mechanic tier or promotion rather than a single global constant |
 | Certification review | Uploaded documents are stored as plain files on local disk (`instance/uploads/certifications/`) | Object storage (S3/GCS) with virus scanning and access-controlled URLs |
+| Password-reset email | Works fully out of the box: if no SMTP server is configured, the reset link is shown directly on screen (dev mode) instead of emailed | Same code path, just point it at a real SMTP server or transactional email service (SendGrid, SES, etc.) |
 | Database | SQLite file, schema created via `db.create_all()` on startup | PostgreSQL (just change `DATABASE_URL`; the ORM code doesn't change) with Flask-Migrate/Alembic-managed migrations |
 | Notifications | None -- customers/mechanics discover updates by revisiting the page (or the JS polling on the tracking view) | Push notifications / SMS (relevant in Lebanon given variable data connectivity) via a provider like Twilio |
 | Mechanic matching | A pending request is visible to every approved mechanic; whoever accepts first gets it | Proximity-based matching using real mechanic locations |
@@ -153,6 +179,6 @@ RoadRescue/
     uploads/certifications/    uploaded mechanic certification documents
   seed.py                 demo data
   wsgi.py                  `flask run` entry point
-  tests/                    pytest suite (state machine, access control, requests, payment)
+  tests/                    pytest suite (state machine, access control, requests, payment, admin, auth)
   requirements.txt
 ```

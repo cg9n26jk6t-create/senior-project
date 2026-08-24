@@ -38,6 +38,12 @@
       {% endif %}
       <dt>Requested</dt><dd>{{ r.created_at.strftime('%d %b %Y, %H:%M') }}</dd>
     </dl>
+    {% if r.status == 'pending' %}
+      <form method="POST" action="{{ url_for('customer.cancel_request', request_id=r.id) }}" onsubmit="return confirm('Cancel this request?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-ghost btn-danger btn-small">Cancel request</button>
+      </form>
+    {% endif %}
   </div>
 
   {% if r.mechanic %}
