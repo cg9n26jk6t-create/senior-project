@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Request assistance{% endblock %}
+{% block head %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+{% block content %}
+  <div class="card form-card">
+    <h2>Request roadside assistance</h2>
+    <form method="POST" novalidate id="request-form">
+      {{ form.hidden_tag() }}
+      {{ form.latitude(id="location-lat") }}
+      {{ form.longitude(id="location-lng") }}
+      <div class="field">
+        {{ form.vehicle_id.label }}
+        {{ form.vehicle_id(class_="input") }}
+      </div>
+      <div class="field">
+        {{ form.issue_type.label }}
+        {{ form.issue_type(class_="input", id="issue-type-select") }}
+      </div>
+      <div class="field" id="details-field">
+        {{ form.details.label }}
+        {{ form.details(class_="input", rows="3", id="details-textarea", placeholder="e.g. the car started making a grinding noise and then wouldn't start") }}
+        <p class="field-hint" id="details-hint">Required when you choose &quot;Other&quot;, optional otherwise.</p>
+        {% for error in form.details.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="field">
+        <label>Drop a pin on your location</label>
+        <div id="location-map" class="map-picker"></div>
+        <p class="field-hint">Click or drag the pin to your exact spot. Attribution: &copy; OpenStreetMap contributors.</p>
+      </div>
+      <div class="field">
+        {{ form.address.label }}
+        {{ form.address(class_="input", id="location-address", list="lebanese-areas", placeholder="e.g. Hamra, near AUB main gate") }}
+        <datalist id="lebanese-areas">
+          {% for area in areas %}
+            <option value="{{ area }}"></option>
+          {% endfor %}
+        </datalist>
+        <p class="field-hint">Filled in automatically from the map pin -- feel free to edit it.</p>
+        {% for error in form.address.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field field-inline">
+        {{ form.urgent() }} {{ form.urgent.label }}
+      </div>
+
+      <div class="field">
+        {{ form.service_mode.label }}
+        {{ form.service_mode(class_="input", id="service-mode-select") }}
+      </div>
+
+      <div id="appointment-fields">
+        <div class="field">
+          {{ form.appointment_date.label }}
+          {{ form.appointment_date(class_="input") }}
+          {% for error in form.appointment_date.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="field">
+          {{ form.appointment_time_of_day.label }}
+          {{ form.appointment_time_of_day(class_="input") }}
+        </div>
+        <div class="field">
+          {{ form.appointment_mechanic_id.label }}
+          {{ form.appointment_mechanic_id(class_="input") }}
+          <p class="field-hint">Only mechanics who are currently marked available are listed.</p>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>How do you plan to pay?</label>
+        <div class="field-inline star-choice">
+          {% for subfield in form.preferred_payment_method %}
+            <label class="star-option">{{ subfield }} {{ subfield.label.text }}</label>
+          {% endfor %}
+        </div>
+        <p class="field-hint">You can still change this when the job is done.</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full">Submit request</button>
+    </form>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    window.ROADRESCUE_MAP_CENTER = [{{ map_center[0] }}, {{ map_center[1] }}];
+    window.ROADRESCUE_MAP_ZOOM = {{ map_zoom }};
+  </script>
+  <script src="{{ url_for('static', filename='js/location_picker.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/request_form.js') }}"></script>
+{% endblock %}

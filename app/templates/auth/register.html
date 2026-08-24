@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+  <div class="card form-card">
+    <h2>Create your account</h2>
+    <form method="POST" novalidate id="register-form">
+      {{ form.hidden_tag() }}
+
+      <div class="field">
+        {{ form.role.label }}
+        {{ form.role(class_="input") }}
+      </div>
+      <div class="field">
+        {{ form.name.label }}
+        {{ form.name(class_="input") }}
+        {% for error in form.name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.email.label }}
+        {{ form.email(class_="input") }}
+        {% for error in form.email.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.phone.label }}
+        {{ form.phone(class_="input", placeholder="+961 71 234 567") }}
+        <p class="field-hint">Format: +961 71 234 567</p>
+        {% for error in form.phone.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.password.label }}
+        {{ form.password(class_="input") }}
+        {% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.confirm_password.label }}
+        {{ form.confirm_password(class_="input") }}
+        {% for error in form.confirm_password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Create account</button>
+    </form>
+    <p class="muted form-footnote">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a>.</p>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
+{% endblock %}

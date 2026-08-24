@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% from "_macros.html" import star_display %}
+{% block title %}My reviews & complaints{% endblock %}
+{% block content %}
+  <h1>My reviews &amp; complaints</h1>
+
+  <h2 class="section-title">Ratings I've given</h2>
+  {% if ratings_pagination.items %}
+    <div class="card-list">
+      {% for rating in ratings_pagination.items %}
+        <a class="card list-card" href="{{ url_for('customer.request_detail', request_id=rating.request_id) }}">
+          <div>
+            <strong>{{ rating.request.mechanic.user.name }}</strong> &middot; {{ rating.request.issue_label }}
+            <p class="muted">{{ rating.created_at.strftime('%d %b %Y') }}</p>
+            {% if rating.review_text %}<p>&ldquo;{{ rating.review_text }}&rdquo;</p>{% endif %}
+          </div>
+          {{ star_display(rating.stars) }}
+        </a>
+      {% endfor %}
+    </div>
+    {% if ratings_pagination.pages > 1 %}
+      <nav class="pagination">
+        {% if ratings_pagination.has_prev %}
+          <a href="{{ url_for('customer.reviews', ratings_page=ratings_pagination.prev_num, complaints_page=complaints_pagination.page) }}">&laquo; Previous</a>
+        {% else %}
+          <span class="disabled">&laquo; Previous</span>
+        {% endif %}
+        <span class="pagination-status">Page {{ ratings_pagination.page }} of {{ ratings_pagination.pages }}</span>
+        {% if ratings_pagination.has_next %}
+          <a href="{{ url_for('customer.reviews', ratings_page=ratings_pagination.next_num, complaints_page=complaints_pagination.page) }}">Next &raquo;</a>
+        {% else %}
+          <span class="disabled">Next &raquo;</span>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">You haven't rated a mechanic yet.</p>
+    </div>
+  {% endif %}
+
+  <h2 class="section-title">Complaints I've filed</h2>
+  {% if complaints_pagination.items %}
+    <div class="card-list">
+      {% for complaint in complaints_pagination.items %}
+        <a class="card list-card" href="{{ url_for('customer.request_detail', request_id=complaint.request_id) }}">
+          <div>
+            <strong>{{ complaint.request.mechanic.user.name }}</strong> &middot; {{ complaint.request.issue_label }}
+            <p class="muted">{{ complaint.created_at.strftime('%d %b %Y') }}</p>
+            <p>{{ complaint.text }}</p>
+          </div>
+          <span class="badge badge-{{ 'urgent' if complaint.status == 'open' else 'approved' }}">{{ complaint.status | capitalize }}</span>
+        </a>
+      {% endfor %}
+    </div>
+    {% if complaints_pagination.pages > 1 %}
+      <nav class="pagination">
+        {% if complaints_pagination.has_prev %}
+          <a href="{{ url_for('customer.reviews', complaints_page=complaints_pagination.prev_num, ratings_page=ratings_pagination.page) }}">&laquo; Previous</a>
+        {% else %}
+          <span class="disabled">&laquo; Previous</span>
+        {% endif %}
+        <span class="pagination-status">Page {{ complaints_pagination.page }} of {{ complaints_pagination.pages }}</span>
+        {% if complaints_pagination.has_next %}
+          <a href="{{ url_for('customer.reviews', complaints_page=complaints_pagination.next_num, ratings_page=ratings_pagination.page) }}">Next &raquo;</a>
+        {% else %}
+          <span class="disabled">Next &raquo;</span>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">You haven't filed a complaint.</p>
+    </div>
+  {% endif %}
+{% endblock %}

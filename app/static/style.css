@@ -1,0 +1,721 @@
+/* RoadRescue - light, neutral, friendly theme */
+
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --primary: #4f7cac;
+  --primary-dark: #3f6690;
+  --amber: #e8a33d;
+  --green: #3fa373;
+  --red: #c65b5b;
+  --text: #2d3142;
+  --muted: #6b7280;
+  --border: #e3e5ea;
+  --radius: 10px;
+  --shadow: 0 2px 10px rgba(45, 49, 66, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Poppins", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 600;
+  margin: 0 0 0.5em 0;
+}
+
+p {
+  margin: 0 0 0.75em 0;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ---------- header ---------- */
+
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.brand {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--text);
+}
+
+.brand span {
+  color: var(--primary);
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.main-nav a {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.main-nav a:hover {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.nav-user {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ---------- layout helpers ---------- */
+
+main.container {
+  padding-top: 28px;
+  padding-bottom: 60px;
+  min-height: 70vh;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.section-title {
+  margin-top: 32px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 640px) {
+  .grid-2, .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- cards ---------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--text);
+}
+
+.list-card:hover {
+  border-color: var(--primary);
+  text-decoration: none;
+}
+
+.list-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.stat-card {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.stat-label {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* ---------- hero ---------- */
+
+.hero {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.hero h1 {
+  font-size: 2rem;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero p {
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn:hover {
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-danger {
+  color: var(--red);
+}
+
+.btn-danger:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* ---------- forms ---------- */
+
+.form-card {
+  max-width: 480px;
+  margin: 0 auto 20px auto;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.field-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-inline label {
+  margin-bottom: 0;
+}
+
+.input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.input:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.dropzone {
+  display: none;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 28px 16px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--bg);
+}
+
+/* Only shown once certification_upload.js confirms it's running, so a
+   no-JS visitor instead sees the plain <input type="file"> beneath it. */
+.dropzone-active {
+  display: block;
+}
+
+.dropzone.dragover {
+  border-color: var(--primary);
+  background: #eef3f8;
+}
+
+.dropzone-text {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.map-picker,
+.tracking-map {
+  height: 260px;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+
+.field-hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* Stripe Elements mounts an iframe into this div -- it needs to look like
+   our other inputs even though Stripe controls the content inside it. */
+.card-element {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.field-error {
+  color: var(--red);
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.form-footnote {
+  text-align: center;
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+.star-choice {
+  display: flex;
+  gap: 12px;
+}
+
+.star-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 400;
+}
+
+/* ---------- flash messages ---------- */
+
+.flash-stack {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flash {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  border: 1px solid transparent;
+}
+
+.flash-success {
+  background: #eaf6f0;
+  color: var(--green);
+  border-color: #cdeadd;
+}
+
+.flash-error {
+  background: #fbeeee;
+  color: var(--red);
+  border-color: #f2d4d4;
+}
+
+.flash-info {
+  background: #eef3f8;
+  color: var(--primary-dark);
+  border-color: #d9e5f0;
+}
+
+/* ---------- badges ---------- */
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: #eef1f5;
+  color: var(--muted);
+}
+
+.badge-pending, .badge-accepted {
+  background: #fbf0dd;
+  color: #a9740f;
+}
+
+.badge-enroute, .badge-arrived, .badge-inprogress {
+  background: #e8f0fa;
+  color: var(--primary-dark);
+}
+
+.badge-completed {
+  background: #fbf0dd;
+  color: #a9740f;
+}
+
+.badge-paid, .badge-rated, .badge-approved {
+  background: #e6f4ed;
+  color: var(--green);
+}
+
+.badge-suspended, .badge-urgent {
+  background: #fbeaea;
+  color: var(--red);
+}
+
+.badge-unregistered {
+  background: #eef1f5;
+  color: var(--muted);
+}
+
+/* ---------- detail list ---------- */
+
+.detail-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 0;
+}
+
+.detail-list dt {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.detail-list dd {
+  margin: 0;
+}
+
+/* ---------- tracking widget ---------- */
+
+.tracking-card {
+  text-align: center;
+}
+
+.tracking-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 16px 0;
+}
+
+.progress-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #eef1f5;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  transition: width 1s linear;
+}
+
+/* ---------- pagination ---------- */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+.pagination .disabled {
+  color: var(--border);
+}
+
+.pagination-status {
+  color: var(--muted);
+}
+
+/* ---------- stars ---------- */
+
+.stars {
+  color: var(--amber);
+  letter-spacing: 2px;
+}
+
+.pay-or {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 8px 0;
+}
+
+.pay-amount {
+  font-family: "Poppins", sans-serif;
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-align: center;
+  margin: 10px 0 20px 0;
+}
+
+/* ---------- footer ---------- */
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 20px 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ---------- mobile layout ----------
+   Kept last in the file on purpose: several rules here (e.g. input
+   font-size) share equal specificity with earlier base rules, and for
+   equal-specificity selectors the cascade picks whichever rule appears
+   LAST in the stylesheet, regardless of the media query. Placing this
+   block earlier silently lost that tie-break to the base rules below it.
+*/
+
+@media (max-width: 700px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .main-nav {
+    width: 100%;
+    gap: 4px 18px;
+    row-gap: 10px;
+  }
+
+  .main-nav a,
+  .nav-user {
+    font-size: 1rem;
+  }
+
+  .nav-user {
+    order: 10;
+    width: 100%;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+
+  main.container {
+    padding-top: 20px;
+    padding-bottom: 40px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header .btn {
+    width: 100%;
+  }
+
+  .hero {
+    padding: 32px 16px;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .list-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .list-actions {
+    width: 100%;
+  }
+
+  .list-actions form {
+    display: flex;
+    flex: 1;
+  }
+
+  .list-actions .btn {
+    flex: 1;
+  }
+
+  .detail-list {
+    grid-template-columns: 1fr;
+    gap: 2px 0;
+  }
+
+  .detail-list dt {
+    margin-top: 8px;
+  }
+
+  .detail-list dt:first-child {
+    margin-top: 0;
+  }
+
+  .tracking-stats {
+    gap: 24px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .star-choice {
+    flex-wrap: wrap;
+  }
+
+  /* Inputs below 16px trigger an auto-zoom on focus in iOS Safari. */
+  .input,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /* Keep tap targets comfortably above the ~44px accessibility minimum. */
+  .btn-small {
+    padding: 10px 14px;
+  }
+}

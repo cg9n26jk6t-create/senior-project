@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Job #{{ r.id }}{% endblock %}
+{% block content %}
+  <div class="page-header">
+    <h1>{{ r.issue_label }}</h1>
+    {{ status_badge(r.status, STATUS_LABELS[r.status]) }}
+  </div>
+
+  <div class="card">
+    <dl class="detail-list">
+      <dt>Vehicle</dt><dd>{{ r.vehicle.label }}</dd>
+      {% if r.details %}
+        <dt>Details</dt><dd>{{ r.details }}</dd>
+      {% endif %}
+      <dt>Location</dt><dd>{{ r.address }}</dd>
+      <dt>Urgent</dt><dd>{{ 'Yes (+$%d surcharge)' % URGENT_SURCHARGE if r.urgent else 'No' }}</dd>
+      <dt>Service type</dt>
+      <dd>
+        {% if r.service_mode == 'appointment' %}
+          Appointment drop-off &mdash; {{ r.appointment_date.strftime('%d %b %Y') }} ({{ r.appointment_time_of_day | capitalize }})
+        {% else %}
+          On-demand
+        {% endif %}
+      </dd>
+      <dt>Cost</dt><dd>${{ '%.2f' % r.cost }}</dd>
+      <dt>Customer</dt><dd>{{ r.customer.name }}</dd>
+      <dt>Customer phone</dt><dd>{{ r.customer.phone }}</dd>
+    </dl>
+  </div>
+
+  {% if r.status == 'enroute' %}
+    <div class="card">
+      <h3>En route</h3>
+      <p class="muted">{{ r.distance_km }} km remaining &middot; ETA {{ r.eta_minutes }} min</p>
+      <p class="field-hint">This updates automatically as you get closer; refresh the page to see the latest distance.</p>
+    </div>
+  {% endif %}
+
+  {% if r.status in ('accepted', 'arrived', 'inprogress') %}
+    <div class="card">
+      <form method="POST" action="{{ url_for('mechanic.advance_job', request_id=r.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% if r.status == 'accepted' and r.service_mode == 'appointment' %}
+          <button type="submit" class="btn btn-primary btn-full">Customer has dropped off the car (start job)</button>
+        {% elif r.status == 'accepted' %}
+          <button type="submit" class="btn btn-primary btn-full">Start driving (mark en route)</button>
+        {% elif r.status == 'arrived' %}
+          <button type="submit" class="btn btn-primary btn-full">Start job (mark in progress)</button>
+        {% elif r.status == 'inprogress' %}
+          <button type="submit" class="btn btn-primary btn-full">Mark job completed</button>
+        {% endif %}
+      </form>
+    </div>
+  {% endif %}
+
+  {% if r.status in ('completed', 'paid', 'rated') %}
+    <div class="card">
+      <p class="muted">This job is complete. {{ 'Awaiting payment.' if r.status == 'completed' else 'Payment received.' }}</p>
+      <dl class="detail-list">
+        <dt>Job cost</dt><dd>${{ '%.2f' % r.cost }}</dd>
+        <dt>Platform fee</dt><dd>-${{ '%.2f' % r.platform_fee }}</dd>
+        <dt>Your payout</dt><dd><strong>${{ '%.2f' % r.mechanic_payout }}</strong></dd>
+      </dl>
+      {% if r.rating %}
+        <p>Customer rating: {{ r.rating.stars }} / 5</p>
+        {% if r.rating.review_text %}<p class="muted">&ldquo;{{ r.rating.review_text }}&rdquo;</p>{% endif %}
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

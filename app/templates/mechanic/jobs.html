@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pagination_nav %}
+{% block title %}Job history{% endblock %}
+{% block content %}
+  <h1>Job history</h1>
+
+  {% if pagination.items %}
+    <div class="card-list">
+      {% for r in pagination.items %}
+        <a class="card list-card" href="{{ url_for('mechanic.job_detail', request_id=r.id) }}">
+          <div>
+            <strong>{{ r.issue_label }}</strong>
+            <p class="muted">{{ r.address }} &middot; {{ r.created_at.strftime('%d %b %Y') }} &middot; ${{ '%.2f' % r.cost }}</p>
+          </div>
+          <span class="badge badge-{{ r.status }}">{{ STATUS_LABELS[r.status] }}</span>
+        </a>
+      {% endfor %}
+    </div>
+    {{ pagination_nav(pagination, 'mechanic.job_history') }}
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">You haven't taken any jobs yet.</p>
+    </div>
+  {% endif %}
+{% endblock %}

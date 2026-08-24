@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pagination_nav %}
+{% block title %}All requests{% endblock %}
+{% block content %}
+  <h1>All requests</h1>
+
+  {% if pagination.items %}
+    <div class="card-list">
+      {% for r in pagination.items %}
+        <div class="card list-card">
+          <div>
+            <strong>{{ r.issue_label }}</strong>
+            {% if r.urgent %}<span class="badge badge-urgent">Urgent</span>{% endif %}
+            <p class="muted">
+              {{ r.customer.name }}
+              {% if r.mechanic %} &middot; mechanic: {{ r.mechanic.user.name }}{% endif %}
+              &middot; {{ r.address }} &middot; {{ r.created_at.strftime('%d %b %Y') }} &middot; ${{ '%.2f' % r.cost }}
+            </p>
+          </div>
+          <span class="badge badge-{{ r.status }}">{{ STATUS_LABELS[r.status] }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    {{ pagination_nav(pagination, 'admin.requests_list') }}
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">No requests have been made yet.</p>
+    </div>
+  {% endif %}
+{% endblock %}

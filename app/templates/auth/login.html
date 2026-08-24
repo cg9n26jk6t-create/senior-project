@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+  <div class="card form-card">
+    <h2>Log in</h2>
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="field">
+        {{ form.email.label }}
+        {{ form.email(class_="input") }}
+        {% for error in form.email.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.password.label }}
+        {{ form.password(class_="input") }}
+        {% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field field-inline">
+        {{ form.remember_me() }} {{ form.remember_me.label }}
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Log in</button>
+    </form>
+    <p class="muted form-footnote">No account yet? <a href="{{ url_for('auth.register') }}">Register here</a>.</p>
+  </div>
+{% endblock %}

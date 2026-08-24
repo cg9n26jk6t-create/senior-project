@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Roadside assistance in Lebanon{% endblock %}
+{% block content %}
+  <section class="hero card">
+    <h1>Roadside help, wherever you are in Lebanon.</h1>
+    <p class="muted">
+      Flat tire in Hamra? Dead battery in Zahle? RoadRescue connects you with a verified,
+      nearby mechanic in minutes &mdash; with live tracking and simple in-app payment.
+    </p>
+    <div class="hero-actions">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Create an account</a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Log in</a>
+    </div>
+  </section>
+
+  <section class="grid-3">
+    <div class="card">
+      <h3>1. Request help</h3>
+      <p class="muted">Pick your vehicle, describe the issue, and share your location.</p>
+    </div>
+    <div class="card">
+      <h3>2. Track your mechanic</h3>
+      <p class="muted">Watch distance and ETA update live as they head your way.</p>
+    </div>
+    <div class="card">
+      <h3>3. Pay & rate</h3>
+      <p class="muted">Pay securely once the job is done, then rate your mechanic.</p>
+    </div>
+  </section>
+{% endblock %}

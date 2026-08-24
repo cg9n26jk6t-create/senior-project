@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pagination_nav %}
+{% block title %}Complaints{% endblock %}
+{% block content %}
+  <h1>Complaints</h1>
+
+  {% if pagination.items %}
+    <div class="card-list">
+      {% for c in pagination.items %}
+        <div class="card list-card">
+          <div>
+            <strong>{{ c.customer.name }}</strong> vs. <strong>{{ c.request.mechanic.user.name }}</strong>
+            <span class="badge badge-{{ 'urgent' if c.status == 'open' else 'approved' }}">{{ c.status | capitalize }}</span>
+            <p class="muted">Request #{{ c.request_id }} &middot; {{ c.created_at.strftime('%d %b %Y') }}</p>
+            <p>{{ c.text }}</p>
+          </div>
+          {% if c.status == 'open' %}
+            <form method="POST" action="{{ url_for('admin.resolve_complaint', complaint_id=c.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-primary btn-small">Mark resolved</button>
+            </form>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    {{ pagination_nav(pagination, 'admin.complaints') }}
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">No complaints filed yet.</p>
+    </div>
+  {% endif %}
+{% endblock %}

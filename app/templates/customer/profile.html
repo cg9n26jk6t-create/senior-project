@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}My profile{% endblock %}
+{% block content %}
+  <div class="card form-card">
+    <h2>My profile</h2>
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="field">
+        {{ form.name.label }}
+        {{ form.name(class_="input") }}
+        {% for error in form.name.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.email.label }}
+        {{ form.email(class_="input", readonly=true) }}
+        <p class="field-hint">Email cannot be changed.</p>
+      </div>
+      <div class="field">
+        {{ form.phone.label }}
+        {{ form.phone(class_="input") }}
+        {% for error in form.phone.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.new_password.label }}
+        {{ form.new_password(class_="input") }}
+        {% for error in form.new_password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Save changes</button>
+    </form>
+  </div>
+{% endblock %}

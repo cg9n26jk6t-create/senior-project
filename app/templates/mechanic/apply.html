@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}My application{% endblock %}
+{% block content %}
+  <h1>Certifications</h1>
+  <p class="muted">
+    Upload every certification or qualification document you hold (PDF or image). An
+    administrator reviews these before approving your account.
+  </p>
+
+  <div class="card">
+    <p class="badge badge-{{ profile.status }}">{{ profile.status | capitalize }}</p>
+  </div>
+
+  <div class="card form-card">
+    <form method="POST" enctype="multipart/form-data" novalidate id="certification-form">
+      {{ form.hidden_tag() }}
+      <div class="field">
+        {{ form.document.label }}
+        <div class="dropzone" id="cert-dropzone" tabindex="0">
+          <p class="dropzone-text" id="dropzone-text">Drag and drop a file here, or click to choose one</p>
+          <p class="field-hint">PDF, JPG, PNG, or TXT &middot; up to 5MB</p>
+        </div>
+        {{ form.document(id="cert-file-input") }}
+        {% for error in form.document.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary">Upload certification</button>
+    </form>
+  </div>
+
+  {% if profile.certifications %}
+    <div class="card-list">
+      {% for cert in profile.certifications %}
+        <div class="card list-card">
+          <a href="{{ url_for('mechanic.certification_file', cert_id=cert.id) }}" target="_blank">{{ cert.original_filename }}</a>
+          <form method="POST" action="{{ url_for('mechanic.delete_certification', cert_id=cert.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-ghost btn-small btn-danger">Remove</button>
+          </form>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">No certifications uploaded yet.</p>
+    </div>
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/certification_upload.js') }}"></script>
+{% endblock %}

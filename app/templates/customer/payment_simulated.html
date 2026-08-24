@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Pay for request{% endblock %}
+{% block content %}
+  <div class="card form-card">
+    <h2>How would you like to pay?</h2>
+    <p class="muted">{{ r.issue_label }} &middot; {{ r.vehicle.label }}</p>
+    <p class="pay-amount">${{ '%.2f' % r.cost }}</p>
+
+    {% if stripe_configured %}
+      <form id="card-payment-form">
+        <div class="field">
+          <label>Card details</label>
+          <div id="card-element" class="input card-element"></div>
+          <p class="field-error" id="card-errors" role="alert"></p>
+        </div>
+        <p class="field-hint">Stripe test mode &mdash; use card number 4242 4242 4242 4242, any future expiry, any CVC. No real charge is made.</p>
+        <button type="submit" class="btn btn-primary btn-full" id="card-submit-btn">Pay ${{ '%.2f' % r.cost }}</button>
+      </form>
+    {% else %}
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="method" value="app">
+        <p class="field-hint">No Stripe test keys are configured for this deployment, so this is simulated locally &mdash; no card details are collected. See the README to enable real Stripe test-mode card payment.</p>
+        <button type="submit" class="btn btn-primary btn-full">Pay in app (test mode)</button>
+      </form>
+    {% endif %}
+
+    <p class="pay-or">or</p>
+
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="method" value="cash">
+      <p class="field-hint">Pay your mechanic directly in cash. We'll mark the request as paid right away.</p>
+      <button type="submit" class="btn btn-ghost btn-full">Pay with cash</button>
+    </form>
+  </div>
+{% endblock %}
+{% block scripts %}
+  {% if stripe_configured %}
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      window.ROADRESCUE_STRIPE_PUBLISHABLE_KEY = {{ stripe_publishable_key | tojson }};
+      window.ROADRESCUE_CREATE_INTENT_URL = {{ url_for('customer.create_payment_intent', request_id=r.id) | tojson }};
+      window.ROADRESCUE_CONFIRM_URL = {{ url_for('customer.confirm_card_payment', request_id=r.id) | tojson }};
+      window.ROADRESCUE_CSRF_TOKEN = {{ csrf_token() | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/stripe_payment.js') }}"></script>
+  {% endif %}
+{% endblock %}

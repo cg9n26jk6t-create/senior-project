@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}RoadRescue{% endblock %} - RoadRescue</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-bar">
+      <a class="brand" href="{{ url_for('index') }}">Road<span>Rescue</span></a>
+      <nav class="main-nav">
+        {% if current_user.is_authenticated %}
+          {% if current_user.role == 'customer' %}
+            <a href="{{ url_for('customer.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('customer.vehicles') }}">Vehicles</a>
+            <a href="{{ url_for('customer.requests_list') }}">My requests</a>
+            <a href="{{ url_for('customer.reviews') }}">My reviews</a>
+            <a href="{{ url_for('customer.profile') }}">Profile</a>
+          {% elif current_user.role == 'mechanic' %}
+            <a href="{{ url_for('mechanic.dashboard') }}">Dashboard</a>
+            {% if current_user.mechanic_profile.status == 'approved' %}
+              <a href="{{ url_for('mechanic.incoming_requests') }}">Incoming requests</a>
+              <a href="{{ url_for('mechanic.job_history') }}">Job history</a>
+            {% else %}
+              <a href="{{ url_for('mechanic.apply') }}">My application</a>
+            {% endif %}
+            <a href="{{ url_for('mechanic.profile') }}">Profile</a>
+          {% elif current_user.role == 'admin' %}
+            <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('admin.requests_list') }}">Requests</a>
+            <a href="{{ url_for('admin.mechanics') }}">Mechanics</a>
+            <a href="{{ url_for('admin.customers') }}">Customers</a>
+            <a href="{{ url_for('admin.complaints') }}">Complaints</a>
+          {% endif %}
+          <span class="nav-user">{{ current_user.name }}</span>
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-ghost btn-small">Log out</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}">Log in</a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-small">Get started</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>RoadRescue &mdash; roadside assistance across Lebanon. Demo build for MIS coursework.</p>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

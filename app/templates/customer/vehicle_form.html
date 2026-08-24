@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit vehicle' if mode == 'edit' else 'Add vehicle' }}{% endblock %}
+{% block content %}
+  <div class="card form-card">
+    <h2>{{ 'Edit vehicle' if mode == 'edit' else 'Add a vehicle' }}</h2>
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="field">
+        {{ form.make.label }}
+        {{ form.make(class_="input", placeholder="e.g. Toyota") }}
+        {% for error in form.make.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.model.label }}
+        {{ form.model(class_="input", placeholder="e.g. Corolla") }}
+        {% for error in form.model.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.year.label }}
+        {{ form.year(class_="input", list="year-options") }}
+        <datalist id="year-options">
+          {% for y in range(current_year + 1, 1969, -1) %}
+            <option value="{{ y }}"></option>
+          {% endfor %}
+        </datalist>
+        <p class="field-hint">Pick from the list or type the year directly.</p>
+        {% for error in form.year.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="field">
+        {{ form.plate.label }}
+        {{ form.plate(class_="input", placeholder="e.g. B 123456") }}
+        {% for error in form.plate.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">{{ 'Save changes' if mode == 'edit' else 'Add vehicle' }}</button>
+    </form>
+  </div>
+{% endblock %}

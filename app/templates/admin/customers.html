@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pagination_nav %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+  <h1>Customers</h1>
+
+  {% if pagination.items %}
+    <div class="card-list">
+      {% for user in pagination.items %}
+        <div class="card list-card">
+          <div>
+            <strong>{{ user.name }}</strong>
+            <p class="muted">{{ user.email }} &middot; {{ user.phone }}</p>
+          </div>
+          <span class="muted">Joined {{ user.created_at.strftime('%d %b %Y') }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    {{ pagination_nav(pagination, 'admin.customers') }}
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">No customers registered yet.</p>
+    </div>
+  {% endif %}
+{% endblock %}

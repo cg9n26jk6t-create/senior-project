@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+  {% if profile.status == 'approved' %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  {% endif %}
+{% endblock %}
+{% block content %}
+  <h1>{{ 'Welcome' if current_user.login_count <= 1 else 'Welcome back' }}, {{ current_user.name.split(' ')[0] }}</h1>
+
+  {% if profile.status != 'approved' %}
+    <div class="card empty-state">
+      {% if profile.status == 'unregistered' %}
+        <p>You haven't submitted an application yet.</p>
+        <a href="{{ url_for('mechanic.apply') }}" class="btn btn-primary">Submit certifications</a>
+      {% elif profile.status == 'pending' %}
+        <p class="badge badge-pending">Application pending admin review</p>
+        <p class="muted">We'll notify you once an administrator reviews your certifications.</p>
+        <a href="{{ url_for('mechanic.apply') }}" class="btn btn-ghost">View / edit certifications</a>
+      {% elif profile.status == 'suspended' %}
+        <p class="badge badge-suspended">Account suspended</p>
+        <p class="muted">Contact an administrator for details.</p>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="card">
+      <div class="page-header">
+        <div>
+          <p class="muted">Availability</p>
+          <p class="badge {{ 'badge-approved' if profile.available else 'badge-suspended' }}">
+            {{ 'Available' if profile.available else 'Offline' }}
+          </p>
+        </div>
+        <form method="POST" action="{{ url_for('mechanic.toggle_availability') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-primary">{{ 'Go offline' if profile.available else 'Go available' }}</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card stat-card">
+        <span class="stat-value">{{ profile.completed_jobs }}</span>
+        <span class="stat-label">Completed jobs</span>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-value">${{ '%.2f' % profile.earnings }}</span>
+        <span class="stat-label">Total earnings</span>
+      </div>
+      <div class="card stat-card">
+        <span class="stat-value">{{ profile.average_rating if profile.average_rating else '-' }}</span>
+        <span class="stat-label">Average rating</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>My location</h3>
+      <p class="muted">
+        {% if profile.current_lat is not none %}
+          Set. This is used to sort incoming on-demand requests by distance to you.
+        {% else %}
+          Not set yet -- incoming requests can't be sorted by distance until you set it.
+        {% endif %}
+      </p>
+      <div id="location-map" class="map-picker"></div>
+      <form method="POST" action="{{ url_for('mechanic.update_location') }}" id="location-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="latitude" id="location-lat">
+        <input type="hidden" name="longitude" id="location-lng">
+        <button type="submit" class="btn btn-primary" id="save-location-btn" disabled>Drop a pin to save</button>
+      </form>
+    </div>
+
+    {% if active_job %}
+      <h2 class="section-title">Current job</h2>
+      <a class="card list-card" href="{{ url_for('mechanic.job_detail', request_id=active_job.id) }}">
+        <div>
+          <strong>{{ active_job.issue_label }}</strong>
+          <p class="muted">{{ active_job.address }}</p>
+        </div>
+        <span class="badge badge-{{ active_job.status }}">{{ STATUS_LABELS[active_job.status] }}</span>
+      </a>
+    {% else %}
+      <h2 class="section-title">Incoming requests</h2>
+      <div class="card empty-state">
+        <p class="muted">{{ pending_count }} pending request{{ 's' if pending_count != 1 else '' }} waiting for a mechanic.</p>
+        <a href="{{ url_for('mechanic.incoming_requests') }}" class="btn btn-primary">View incoming requests</a>
+      </div>
+    {% endif %}
+  {% endif %}
+{% endblock %}
+{% block scripts %}
+  {% if profile.status == 'approved' %}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      window.ROADRESCUE_MAP_CENTER = [{{ map_center[0] }}, {{ map_center[1] }}];
+      window.ROADRESCUE_MAP_ZOOM = {{ map_zoom }};
+      {% if profile.current_lat is not none %}
+        window.ROADRESCUE_MECHANIC_PIN = [{{ profile.current_lat }}, {{ profile.current_lng }}];
+      {% endif %}
+    </script>
+    <script src="{{ url_for('static', filename='js/mechanic_location.js') }}"></script>
+  {% endif %}
+{% endblock %}

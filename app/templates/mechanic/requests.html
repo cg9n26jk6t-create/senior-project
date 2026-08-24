@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Incoming requests{% endblock %}
+{% block content %}
+  <h1>Incoming requests</h1>
+
+  {% if appointments %}
+    <h2 class="section-title">Appointments</h2>
+    <div class="card-list">
+      {% for r in appointments %}
+        <div class="card list-card">
+          <div>
+            <strong>{{ r.issue_label }}</strong>
+            <span class="badge badge-pending">{{ r.appointment_date.strftime('%d %b %Y') }} &middot; {{ r.appointment_time_of_day | capitalize }}</span>
+            {% if r.mechanic_id is none %}<span class="badge">Released -- open to accept</span>{% endif %}
+            <p class="muted">{{ r.address }} &middot; {{ r.vehicle.label }} &middot; ${{ '%.2f' % r.cost }}</p>
+            {% if r.details %}<p class="muted">&ldquo;{{ r.details }}&rdquo;</p>{% endif %}
+          </div>
+          <div class="list-actions">
+            <form method="POST" action="{{ url_for('mechanic.accept_request', request_id=r.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-primary btn-small">{{ 'Confirm' if r.mechanic_id else 'Accept' }}</button>
+            </form>
+            <form method="POST" action="{{ url_for('mechanic.decline_request', request_id=r.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-ghost btn-small">Decline</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <h2 class="section-title">On-demand requests</h2>
+  {% if not has_location %}
+    <div class="card empty-state">
+      <p class="muted">Set your location on your <a href="{{ url_for('mechanic.dashboard') }}">dashboard</a> to see these sorted by distance.</p>
+    </div>
+  {% endif %}
+  {% if on_demand %}
+    <div class="card-list">
+      {% for r in on_demand %}
+        <div class="card list-card">
+          <div>
+            <strong>{{ r.issue_label }}</strong>
+            {% if r.urgent %}<span class="badge badge-urgent">Urgent</span>{% endif %}
+            {% if r.distance_from_me_km is not none %}
+              <span class="badge">{{ r.distance_from_me_km }} km away</span>
+            {% endif %}
+            <p class="muted">{{ r.address }} &middot; {{ r.vehicle.label }} &middot; ${{ '%.2f' % r.cost }}</p>
+            {% if r.details %}<p class="muted">&ldquo;{{ r.details }}&rdquo;</p>{% endif %}
+          </div>
+          <div class="list-actions">
+            <form method="POST" action="{{ url_for('mechanic.accept_request', request_id=r.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-primary btn-small">Accept</button>
+            </form>
+            <form method="POST" action="{{ url_for('mechanic.decline_request', request_id=r.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-ghost btn-small">Decline</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">No incoming requests right now. Check back soon.</p>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+  <div class="page-header">
+    <h1>{{ 'Welcome' if current_user.login_count <= 1 else 'Welcome back' }}, {{ current_user.name.split(' ')[0] }}</h1>
+    <a href="{{ url_for('customer.new_request') }}" class="btn btn-primary">Request assistance</a>
+  </div>
+
+  <div class="grid-2">
+    <div class="card stat-card">
+      <span class="stat-value">{{ vehicle_count }}</span>
+      <span class="stat-label">Vehicle{{ 's' if vehicle_count != 1 else '' }} on file</span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-value">{{ active_requests | length }}</span>
+      <span class="stat-label">Active request{{ 's' if active_requests | length != 1 else '' }}</span>
+    </div>
+  </div>
+
+  <h2 class="section-title">Active requests</h2>
+  {% if active_requests %}
+    <div class="card-list">
+      {% for r in active_requests %}
+        <a class="card list-card" href="{{ url_for('customer.request_detail', request_id=r.id) }}">
+          <div>
+            <strong>{{ r.issue_label }}</strong>
+            <p class="muted">{{ r.address }} &middot; {{ r.vehicle.label }}</p>
+          </div>
+          <span class="badge badge-{{ r.status }}">{{ STATUS_LABELS[r.status] }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">No active requests right now.</p>
+      <a href="{{ url_for('customer.new_request') }}" class="btn btn-primary">Request assistance</a>
+    </div>
+  {% endif %}
+{% endblock %}

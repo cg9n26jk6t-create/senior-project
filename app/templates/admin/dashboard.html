@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard{% endblock %}
+{% block content %}
+  <h1>Platform overview</h1>
+
+  <div class="grid-3">
+    <div class="card stat-card">
+      <span class="stat-value">{{ total_requests }}</span>
+      <span class="stat-label">Total requests</span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-value">{{ completed_jobs }}</span>
+      <span class="stat-label">Completed jobs</span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-value">${{ '%.2f' % gross_job_value }}</span>
+      <span class="stat-label">Gross job value (paid)</span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-value">${{ '%.2f' % platform_revenue }}</span>
+      <span class="stat-label">Platform revenue (commission)</span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-value">{{ average_rating if average_rating else '-' }}</span>
+      <span class="stat-label">Average platform rating</span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-value">{{ active_mechanics }}</span>
+      <span class="stat-label">Active mechanics</span>
+    </div>
+    <div class="card stat-card">
+      <span class="stat-value">{{ pending_approvals }}</span>
+      <span class="stat-label">Pending approvals</span>
+    </div>
+  </div>
+  <p class="field-hint">Gross job value is what customers paid in total; platform revenue is RoadRescue's commission out of that -- the rest went to mechanics as their payout.</p>
+
+  <div class="grid-2">
+    <a class="card list-card" href="{{ url_for('admin.mechanics') }}">
+      <span>Review mechanic applications</span>
+      {% if pending_approvals %}<span class="badge badge-pending">{{ pending_approvals }} pending</span>{% endif %}
+    </a>
+    <a class="card list-card" href="{{ url_for('admin.complaints') }}">
+      <span>Review complaints</span>
+      {% if open_complaints %}<span class="badge badge-urgent">{{ open_complaints }} open</span>{% endif %}
+    </a>
+  </div>
+{% endblock %}

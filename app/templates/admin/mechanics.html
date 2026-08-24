@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pagination_nav %}
+{% block title %}Mechanics{% endblock %}
+{% block content %}
+  <h1>Mechanics</h1>
+
+  {% if pagination.items %}
+    <div class="card-list">
+      {% for profile in pagination.items %}
+        <div class="card list-card">
+          <div>
+            <strong>{{ profile.user.name }}</strong>
+            <span class="badge badge-{{ profile.status }}">{{ profile.status | capitalize }}</span>
+            <p class="muted">
+              {{ profile.completed_jobs }} completed jobs &middot;
+              {{ profile.average_rating if profile.average_rating else 'no ratings yet' }}
+              {% if profile.average_rating %}/ 5{% endif %}
+              &middot; {{ profile.certifications | length }} certification{{ 's' if profile.certifications | length != 1 else '' }}
+            </p>
+            {% if profile.certifications %}
+              <p class="muted">
+                Documents:
+                {% for cert in profile.certifications %}
+                  <a href="{{ url_for('mechanic.certification_file', cert_id=cert.id) }}" target="_blank">{{ cert.original_filename }}</a>{{ ", " if not loop.last }}
+                {% endfor %}
+              </p>
+            {% endif %}
+          </div>
+          <div class="list-actions">
+            {% if profile.status == 'pending' %}
+              <form method="POST" action="{{ url_for('admin.approve_mechanic', mechanic_id=profile.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary btn-small">Approve</button>
+              </form>
+              <form method="POST" action="{{ url_for('admin.reject_mechanic', mechanic_id=profile.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-ghost btn-small btn-danger">Reject</button>
+              </form>
+            {% elif profile.status == 'approved' %}
+              <form method="POST" action="{{ url_for('admin.suspend_mechanic', mechanic_id=profile.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-ghost btn-small btn-danger">Suspend</button>
+              </form>
+            {% elif profile.status == 'suspended' %}
+              <form method="POST" action="{{ url_for('admin.reactivate_mechanic', mechanic_id=profile.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary btn-small">Reactivate</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    {{ pagination_nav(pagination, 'admin.mechanics') }}
+  {% else %}
+    <div class="card empty-state">
+      <p class="muted">No mechanics registered yet.</p>
+    </div>
+  {% endif %}
+{% endblock %}
