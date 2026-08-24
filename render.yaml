@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: roadrescue
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # Free-tier services use an ephemeral filesystem, so every boot re-seeds
+    # fresh demo data -- this keeps the documented demo logins always valid,
+    # at the cost of not persisting changes made between restarts. See the
+    # "Deploying a live demo" section of README.md.
+    startCommand: python seed.py && gunicorn wsgi:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.9

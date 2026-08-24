@@ -95,6 +95,39 @@ pytest
 | Mechanic | rami.mechanic@example.com | Mechanic123! | Approved, offline |
 | Mechanic | sami.mechanic@example.com | Mechanic123! | Still pending admin approval |
 
+## Deploying a live demo (Render)
+
+The app runs entirely from a local Flask dev server by default. To get a real, shareable
+URL instead of `http://127.0.0.1:5000`, deploy it to [Render](https://render.com)'s free
+tier (no credit card required):
+
+1. Sign up / log in at render.com (GitHub login is the fastest option, since the repo is
+   already on GitHub).
+2. Click **New +** -> **Blueprint**, and connect the `senior-project` GitHub repo. Render
+   will detect [render.yaml](render.yaml) in the repo root and pre-fill the build/start
+   commands and a free web service plan -- just click **Apply**.
+   - If you'd rather set it up by hand instead of using the Blueprint: **New +** ->
+     **Web Service**, connect the repo, set the build command to
+     `pip install -r requirements.txt`, the start command to
+     `python seed.py && gunicorn wsgi:app --bind 0.0.0.0:$PORT`, and the instance type to
+     **Free**.
+3. Wait for the first deploy to finish (a couple of minutes). Render gives you a URL like
+   `https://roadrescue-xxxx.onrender.com` -- that's your shareable link.
+
+Two things worth knowing about the free tier:
+
+- **It sleeps when idle.** A free Render service spins down after 15 minutes with no
+  traffic, and the next visit takes 30-60 seconds to wake back up. That's normal, not a
+  bug.
+- **The filesystem resets on every restart.** Free services don't get a persistent disk,
+  so the SQLite database and any uploaded certification files reset to the seeded demo
+  data each time the service restarts (including waking from sleep). `render.yaml` runs
+  `python seed.py` on every boot specifically so the documented demo logins always work,
+  but anything created *during* a live session (a new registration, a new request) won't
+  survive a restart. For a capstone demo this trade-off is usually fine; a real
+  production deployment would instead use Render's managed PostgreSQL (or any external
+  database) so data persists independently of the web service's own filesystem.
+
 ## Enabling real Stripe test-mode card payment
 
 By default (no Stripe keys configured) the "Pay now" flow uses a built-in simulated
